@@ -4,8 +4,8 @@
 ### TODO
 
 * Setup
-  * Set up github
-  * Find unit testing framework
+  * Set up github: Done
+  * Find unit testing framework: Check is simple and os independent https://libcheck.github.io/check/index.html instructions and tutorial are here
 * Code
   * Pull image from a file and preprocess
   * Pull kernel from file
