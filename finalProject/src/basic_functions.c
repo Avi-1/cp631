@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "matrix.h"
 
 int get_value(Matrix* m, int i, int j){
@@ -20,9 +20,9 @@ void free_array(Matrix* m){
 
 Matrix* create_matrix(int w, int h){
   Matrix* m = malloc(sizeof(Matrix));
-  if (m == NULL) {
+  
+  if (m == NULL)
     return NULL;
-  }
   m->width = w;
   m->height = h;
   initialize_array(m);

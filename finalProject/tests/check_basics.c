@@ -1,7 +1,8 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include <check.h>
 #include "../src/matrix.h"
 #include "../src/basic_functions.h"
-#include <stdlib.h>
 
 START_TEST(test_matrix_create) {
   Matrix* m;
@@ -19,7 +20,6 @@ START_TEST(test_matrix_insert) {
   free_matrix(m);
 } END_TEST
 
-
 Suite *matrix_suite(void) {
   Suite *s;
   TCase *tc_core;
@@ -30,7 +30,6 @@ Suite *matrix_suite(void) {
   tcase_add_test(tc_core, test_matrix_create);
   tcase_add_test(tc_core, test_matrix_insert);
   suite_add_tcase(s, tc_core);
-
   return s;
 }
 
