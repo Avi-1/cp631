@@ -8,8 +8,6 @@
   * Find unit testing framework: Check is simple and os independent https://libcheck.github.io/check/index.html instructions and tutorial are here DONE
 * Code
   * Basic Matrix IO functions DONE
-  * Pull image from a file and preprocess
-  * Pull kernel from file
   * Apply kernel to image matrix
   * Send resultant matrix to image file
   
@@ -23,5 +21,7 @@
 * Avi
 
 * Awstin
+ * Pull image from a file and preprocess
+ * Pull kernel from file
 
 * Elena
