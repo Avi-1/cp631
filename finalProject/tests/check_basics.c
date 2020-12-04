@@ -6,7 +6,7 @@
 
 START_TEST(test_matrix_create) {
   Matrix* m;
-  m = create_matrix(10, 5);
+  m = create_matrix(5, 10);
   ck_assert_int_eq(m->width, 10);
   ck_assert_int_eq(m->height, 5);
   free_matrix(m);

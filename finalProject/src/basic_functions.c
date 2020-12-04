@@ -18,9 +18,9 @@ void free_array(Matrix* m){
   free(m->array);
 }
 
-Matrix* create_matrix(int w, int h){
+Matrix* create_matrix(int h, int w){
   Matrix* m = malloc(sizeof(Matrix));
-  
+
   if (m == NULL)
     return NULL;
   m->width = w;

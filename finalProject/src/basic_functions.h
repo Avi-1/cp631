@@ -9,7 +9,7 @@ void initialize_array(Matrix* matrix);
 
 void free_array(Matrix* matrix);
 
-Matrix* create_matrix(int width, int height);
+Matrix* create_matrix(int h, int w);
 
 void free_matrix(Matrix* m);
 
