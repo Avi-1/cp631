@@ -2,7 +2,7 @@ all: clean check_basics_tests check_io_tests
 .PHONY: all
 
 check_io_tests: file_io check_io
-	gcc target/file_io.o target/check_io.o -lcheck -lm -lpthread -lrt -o build/check_file_io
+	gcc target/file_io.o target/check_io.o target/basic_functions.o -lcheck -lm -lpthread -lrt -o build/check_file_io
 
 check_basics_tests: basic_functions check_basics
 	gcc target/basic_functions.o target/check_basics.o -lcheck -lm -lpthread -lrt -o build/check_basics_tests

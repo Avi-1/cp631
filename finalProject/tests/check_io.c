@@ -6,15 +6,25 @@
 #include "../src/file_io.h"
 
 START_TEST(test_get_dimensions) {
-  FILE* file;
+  char* file = "data/kernel.txt";
   int* dim;
 
-  file = fopen("data/kernel.txt", "r+");
   dim = get_dimensions(file);
   ck_assert_int_eq(dim[0], 3);
   ck_assert_int_eq(dim[1], 4);
-  fclose(file);
 } END_TEST
+
+START_TEST(test_get_matrix){
+  char* file_name = "data/kernel.txt";
+  Matrix* kernel;
+  
+  kernel = get_matrix_from_file(file_name);
+  ck_assert_int_eq(get_value(kernel, 0, 3), 6);
+  ck_assert_int_eq(get_value(kernel, 1, 1), 1);
+  ck_assert_int_eq(get_value(kernel, 2, 2), 3);
+  ck_assert_int_eq(get_value(kernel, 0, 0), 0);
+  free_matrix(kernel);
+}END_TEST
 
 Suite *io_suite(void) {
   Suite *s;
@@ -24,6 +34,7 @@ Suite *io_suite(void) {
   tc_core = tcase_create("Core");
 
   tcase_add_test(tc_core, test_get_dimensions);
+  tcase_add_test(tc_core, test_get_matrix);
   suite_add_tcase(s, tc_core);
   return s;
 }
