@@ -5,10 +5,12 @@
 
 * Setup
   * Set up github: DONE
-  * Find unit testing framework: Check is simple and os independent https://libcheck.github.io/check/index.html instructions and tutorial are here DONE
+  * Find unit testing framework: Check is simple and os independent https://libcheck.github.io/check/index.html
+		 instructions and tutorial are here DONE
 * Code
-  * Basic Matrix IO functions DONE
-  * Apply kernel to image matrix
+  * Basic Matrix IO functions, DONE
+  * Pull image from a file and preprocess output as matrix in text file, DONE
+  * Pull matrix from file DONE
   * Send resultant matrix to image file
   
   * Parallelize with both MPI and openMP
@@ -21,7 +23,6 @@
 * Avi
 
 * Awstin
- * Pull image from a file and preprocess
- * Pull kernel from file
+ * Apply kernel to image matrix
 
 * Elena
