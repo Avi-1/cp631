@@ -37,3 +37,16 @@ Matrix* get_matrix_from_file(char* file_name){
   fclose(file);
   return matrix;
 }
+
+void write_matrix_to_file(char* file_name, Matrix* matrix){
+  FILE* file;
+  file = fopen(file_name, "w");
+  for(int i=0; i<matrix->height; i++){
+    for(int j=0; j<matrix->width; j++){
+      fprintf(file, "%d", get_value(matrix, i, j));
+      if(j != matrix->width-1) fprintf(file, " ");
+    }
+    fprintf(file, "\n");
+  }
+  fclose(file);
+}
