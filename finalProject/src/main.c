@@ -10,7 +10,7 @@ int main(int argc, char* argv[]){
     //initialize variables needed
     char *kern, *img, *output;
     Matrix *kernel, *image, *local_image, *final, *local_final;
-    int my_rank, p, kheight, kwidth, iheight, iwidth;
+    int my_rank, p, kheight, kwidth, iheight, iwidth, block_size;
     MPI_Status *status;
 
     //set file names for io
@@ -30,6 +30,7 @@ int main(int argc, char* argv[]){
     if(my_rank == 0){
       kernel = get_matrix_from_file(kern);
       image = get_matrix_from_file(img);
+      final = create_matrix(image->height - kernel->height/2, image->width - kernel->width/2);
       kheight = kernel->height;
       kwidth = kernel->width;
       iheight = image->height/p + (kheight/2);
@@ -61,20 +62,34 @@ int main(int argc, char* argv[]){
         }
       }
       int index = (iheight-1) * iwidth;
+      block_size = (iheight+1)*iwidth
       for(int i=1; i<p; i++){
-        MPI_Send(&image->array[index], iheight*iwidth, MPI_INT, i, 0, MPI_COMM_WORLD);
-        index += iheight * iwidth;
+        MPI_Send(&image->array[index*i], block_size, MPI_INT, i, 0, MPI_COMM_WORLD);
       }
     } else{}
-      MPI_Recv(local_image.array, iheight*iwidth, MPI_INT, 0, 0, MPI_COMM_WORLD, status);
+      MPI_Recv(local_image.array, (iheight+1)*iwidth, MPI_INT, 0, 0, MPI_COMM_WORLD, status);
     }
 
     //calculate local final portion after applying the convolution
     local_final = process_image(kernel, local_image);
 
-    //still need to gather finished portions into the final matrix and instantiate
-    //the final matrix to write, or write it peicemeal from each process.
-    
+    //gather finished portions of the final matrix back into the complete final
+    //for file output
+    if(my_rank == 0){
+      for(int i=0; i<local_image->height; i++){
+        for(int j=0; j<local_image->width; j++){
+          set_value(final, i, j, get_value(local_image, i, j));
+        }
+      }
+      int index = local_image->height * local_image->width;
+      block_size = (iheight+1-kheight/2) * (iwidth-kwidth/2);
+      for(int i=1; i<p; i++){
+        MPI_Recv(&final->array[index], block_size, MPI_INT, i, 0, MPI_COMM_WORLD, status);
+        index += block_size
+      }
+    } else{}
+      MPI_Send(local_final.array, local_final->height*local_final->width, MPI_INT, 0, 0, MPI_COMM_WORLD);
+    }
     MPI_Finalize();
 
     write_matrix_to_file(output, final);
