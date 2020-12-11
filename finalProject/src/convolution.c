@@ -3,6 +3,7 @@
 #include "matrix.h"
 #include "basic_functions.h"
 
+//apply convolution to a single part of the image matrix
 int apply_convolution(Matrix* kernel, Matrix* image, int i, int j){
   int sum = 0;
   for(int x=0; x<kernel->height; x++)
@@ -11,6 +12,7 @@ int apply_convolution(Matrix* kernel, Matrix* image, int i, int j){
   return sum;
 }
 
+//apply convolution to the entire image matrix
 Matrix* process_image(Matrix* kernel, Matrix* image){
   int conv_height = image->height - (kernel->height/2);
   int conv_width = image->width - (kernel->width/2);

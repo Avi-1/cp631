@@ -3,6 +3,7 @@
 #include "matrix.h"
 #include "basic_functions.h"
 
+//run through file once and get dimensions of the matrix
 int* get_dimensions(char* file_name){
   FILE* fp;
   fp = fopen(file_name, "r+");
@@ -21,6 +22,7 @@ int* get_dimensions(char* file_name){
   return d;
 }
 
+//extract the matrix from the file and save in Matrix type
 Matrix* get_matrix_from_file(char* file_name){
   FILE* file;
 
@@ -38,6 +40,7 @@ Matrix* get_matrix_from_file(char* file_name){
   return matrix;
 }
 
+//write matrix to output file
 void write_matrix_to_file(char* file_name, Matrix* matrix){
   FILE* file;
   file = fopen(file_name, "w");
