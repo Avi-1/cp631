@@ -55,3 +55,18 @@ void write_matrix_to_file(char* file_name, Matrix* matrix){
   }
   fclose(file);
 }
+
+void write_array_to_file(char* file_name, int* matrix, int h, int w){
+  FILE* file;
+  file = fopen(file_name, "w");
+  int i, j;
+  for(i=0; i<h; i++){
+    for(j=0; j<w; j++){
+      fprintf(file, "%d", matrix[w*i + j]);
+      if(j != w-1) fprintf(file, " ");
+    }
+    fprintf(file, "\n");
+  }
+  fclose(file);
+}
+

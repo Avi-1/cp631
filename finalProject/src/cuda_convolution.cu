@@ -7,6 +7,7 @@ extern "C" {
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 __global__ void apply_sobel_convolution_cuda(int *kernel_x, int *kernel_y, int *image, int*output, int kernel_x_dim, int image_height, int image_width){
     int col = blockIdx.x * blockDim.x + threadIdx.x;

@@ -7,4 +7,6 @@ Matrix* get_matrix_from_file(char* file_name);
 
 void write_matrix_to_file(char* file_name, Matrix* matrix);
 
+void write_array_to_file(char* file_name, int* matrix, int h, int w);
+
 #endif
