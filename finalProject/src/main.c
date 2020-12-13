@@ -6,16 +6,18 @@
 #include"convolution.h"
 
 int main(int argc, char* argv[]){
-    char *kern, *img, *output;
-    Matrix *kernel, *image, *final;
+    char *kern_x, *kern_y, *img, *output;
+    Matrix *kernel_x, *kernel_y, *image, *final;
 
-    kern = argv[1];
-    img = argv[2];
-    output = argv[3];
+    kern_x = argv[1];
+    kern_y = argv[2];
+    img = argv[3];
+    output = argv[4];
 
-    kernel = get_matrix_from_file(kern);
+    kernel_x = get_matrix_from_file(kern_x);
+    kernel_y = get_matrix_from_file(kern_y);
     image = get_matrix_from_file(img);
-    final = process_image(kernel, image);
+    final = process_image(kern_x, kern_y, image);
 
     write_matrix_to_file(output, final);
 
