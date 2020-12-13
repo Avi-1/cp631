@@ -10,9 +10,24 @@ extern "C" {
 #include <string.h>
 #include <time.h>
 
+const int N = 3;
+const int THREADS = 32;
+
 __global__ void apply_sobel_convolution_cuda(int *kernel_x, int *kernel_y, int *image, int*output, int kernel_x_dim, int image_height, int image_width){
-    int col = blockIdx.x * blockDim.x + threadIdx.x;
-    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    unsigned int tx = threadIdx.x, ty = threadIdx.y;
+    int col = blockIdx.x * blockDim.x + tx;
+    int row = blockIdx.y * blockDim.y + ty;
+
+    __shared__ int shared_kernel_x[N][N];
+    __shared__ int shared_kernel_y[N][N];
+
+    if(tx < kernel_x_dim && ty <kernel_x_dim){
+        shared_kernel_x[ty][tx] = kernel_x[ty * kernel_x_dim + tx];
+        shared_kernel_y[ty][tx] = kernel_y[ty * kernel_x_dim + tx];
+    }
+
+    __syncthreads();
+
     int index = row * image_width + col;
     if( row <= image_height && col <= image_width){
         int gradient_magnitude, border = kernel_x_dim/2;
@@ -25,14 +40,16 @@ __global__ void apply_sobel_convolution_cuda(int *kernel_x, int *kernel_y, int *
             // Apply x
             for(i = 0-border; i <= border; i++){
                 for(j = 0-border; j <= border; j++){
-                    convolution_sum_x += kernel_x[(i+border) * kernel_x_dim + j+border] * image[(row+i)*image_width + col+j];
+                    //convolution_sum_x += kernel_x[(i+border) * kernel_x_dim + j+border] * image[(row+i)*image_width + col+j];
+                    convolution_sum_x += shared_kernel_x[i+border][j+border] * image[(row+i)*image_width + col+j];
                 }
             }
 
             // Apply y
             for(i = 0-border; i <= border; i++){
                 for(j = 0-border; j <= border; j++){
-                    convolution_sum_y += kernel_y[(i+border) * kernel_x_dim + j+border] * image[(row+i)*image_width + col+j];
+                    //convolution_sum_y += kernel_y[(i+border) * kernel_x_dim + j+border] * image[(row+i)*image_width + col+j];
+                    convolution_sum_y += shared_kernel_y[i+border][j+border] * image[(row+i)*image_width + col+j];
                 }
             }
 
@@ -73,6 +90,7 @@ int main(int argc, char* argv[]){
 
     size_t image_size = image->width * image->height * sizeof(int);
     size_t kernel_size  = kernel_x->width * kernel_x->height * sizeof(int);
+    int blocks = 2 * sqrt(image->height * image->width / (THREADS * THREADS));
 
     clock_t start = clock();
     cudaMalloc((void **) &image_gpu, image_size);
@@ -85,9 +103,8 @@ int main(int argc, char* argv[]){
     cudaMemcpy(kernel_x_gpu, kernel_x->array, kernel_size, cudaMemcpyHostToDevice);
     cudaMemcpy(kernel_y_gpu, kernel_x->array, kernel_size, cudaMemcpyHostToDevice);
 
-    int blocks = 2 * sqrt((image->height * image->width) / 1024);
     dim3 blocksPerGrid(blocks, blocks, 1);
-    dim3 threadsPerGrid(32, 32, 1);
+    dim3 threadsPerGrid(THREADS, THREADS, 1);
     apply_sobel_convolution_cuda<<<blocksPerGrid, threadsPerGrid>>>(kernel_x_gpu, kernel_y_gpu, image_gpu, convoluted_image_gpu, kernel_x->width, image->height, image->width);
 
     cudaMemcpy(shadow, convoluted_image_gpu, image_size, cudaMemcpyDeviceToHost);
@@ -98,7 +115,8 @@ int main(int argc, char* argv[]){
       exit (error);
     }
 
-    float time_spent = (float)(clock() - start) / CLOCKS_PER_SEC;
+    clock_t end = clock();
+    float time_spent = (float)(end - start) / CLOCKS_PER_SEC;
 
     write_array_to_file(output, &shadow[0][0], image->height, image->width);
 

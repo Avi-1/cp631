@@ -1,6 +1,7 @@
 from PIL import Image
 import sys
 
+Image.MAX_IMAGE_PIXELS = None
 file_in = sys.argv[1]
 file_out = sys.argv[2]
 image_width = int(sys.argv[3])
