@@ -29,8 +29,9 @@ Matrix* get_matrix_from_file(char* file_name){
   int* dimensions = get_dimensions(file_name);
   file = fopen(file_name, "r+");
   Matrix* matrix = create_matrix(dimensions[0], dimensions[1]);
-  for(int i=0; i<matrix->height; i++){
-    for(int j=0; j<matrix->width; j++){
+  int i,j;
+  for(i=0; i<matrix->height; i++){
+    for(j=0; j<matrix->width; j++){
       int value;
       fscanf(file, "%d", &value);
       set_value(matrix, i, j, value);
@@ -44,8 +45,9 @@ Matrix* get_matrix_from_file(char* file_name){
 void write_matrix_to_file(char* file_name, Matrix* matrix){
   FILE* file;
   file = fopen(file_name, "w");
-  for(int i=0; i<matrix->height; i++){
-    for(int j=0; j<matrix->width; j++){
+  int i,j;
+  for(i=0; i<matrix->height; i++){
+    for(j=0; j<matrix->width; j++){
       fprintf(file, "%d", get_value(matrix, i, j));
       if(j != matrix->width-1) fprintf(file, " ");
     }

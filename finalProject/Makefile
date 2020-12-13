@@ -1,4 +1,4 @@
-all: clean check_basics_tests check_io_tests check_convolution_tests full_program mpi_program cuda_full_program
+all: clean full_program mpi_program cuda_full_program
 .PHONY: all
 
 mpi_program:

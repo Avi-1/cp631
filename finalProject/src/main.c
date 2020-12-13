@@ -17,7 +17,7 @@ int main(int argc, char* argv[]){
     kernel_x = get_matrix_from_file(kern_x);
     kernel_y = get_matrix_from_file(kern_y);
     image = get_matrix_from_file(img);
-    final = process_image(kern_x, kern_y, image);
+    final = process_image(kernel_x, kernel_y, image);
 
     write_matrix_to_file(output, final);
 
