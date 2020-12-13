@@ -7,6 +7,9 @@ mpi_program:
 full_program: main convolution file_io basic_functions
 	gcc target/main.o target/basic_functions.o target/file_io.o target/convolution.o -o build/main.x
 
+cuda_full_program:
+	nvcc -rdc=true src/basic_functions.c src/file_io.c src/convolution.c src/cuda_convolution.cu -o build/cuda_main.x -lm
+
 check_basics_tests: basic_functions check_basics
 	gcc target/basic_functions.o target/check_basics.o -lcheck -o build/check_basics_tests
 
@@ -27,6 +30,9 @@ convolution:
 
 main:
 	gcc -c src/main.c -o target/main.o
+
+cuda_main:
+	nvcc -c src/cuda_convolution.cu -o target/cuda_main.o -lm
 
 check_basics:
 	gcc -c tests/check_basics.c -o target/check_basics.o
