@@ -10,10 +10,11 @@
 int main(int argc, char* argv[]){
     //initialize variables needed
     char *kern, *img, *output;
-    Matrix *kernel, *image, *local_image, *final, *local_final;
+    Matrix *kernel, *image, *final, *local_image, *local_final;
     int my_rank, p, kheight, kwidth, iheight, iwidth, block_size;
     MPI_Status *status;
 
+    local_final = NULL;
     //set file names for io
     kern = argv[1];
     img = argv[2];
@@ -31,7 +32,7 @@ int main(int argc, char* argv[]){
     if(my_rank == 0){
       kernel = get_matrix_from_file(kern);
       image = get_matrix_from_file(img);
-      final = create_matrix(image->height - kernel->height/2, image->width - kernel->width/2);
+      final = create_matrix(image->height - (kernel->height/2)*2, image->width - (kernel->width/2)*2);
       kheight = kernel->height;
       kwidth = kernel->width;
       iheight = image->height/p + (kheight/2);
@@ -47,17 +48,13 @@ int main(int argc, char* argv[]){
 
     //other processes initialize relevant matrices problem is in the matrix initialization
     if(my_rank != 0){
-      printf("Process %d creating matrices.\n", my_rank);
-      fflush(stdout);
       kernel = create_matrix(kheight, kwidth);
-      printf("%d %d", kernel->height, kernel->width);
       local_image = create_matrix(iheight, iwidth);
     }
-    //for(int i=0; i<kheight*kwidth; i++) printf("%d ", kernel->array[i]);
 
     //broadcast kernel so every process has a copy
-    //MPI_Bcast(kernel->array, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    /*
+    MPI_Bcast(kernel->array, kheight*kwidth, MPI_INT, 0, MPI_COMM_WORLD);
+
     //copy image portion into local matrix and send image slices out to other
     //processes
     if(my_rank == 0){
@@ -66,13 +63,13 @@ int main(int argc, char* argv[]){
           set_value(local_image, i, j, get_value(image, i, j));
         }
       }
-      int index = (iheight-1) * iwidth;
-      block_size = (iheight+1)*iwidth;
+      int index = (iheight-1-kheight/2) * iwidth;
+      block_size = iheight*iwidth;
       for(int i=1; i<p; i++){
         MPI_Send(&image->array[index*i], block_size, MPI_INT, i, 0, MPI_COMM_WORLD);
       }
     } else{
-      MPI_Recv(&local_image->array, (iheight+1)*iwidth, MPI_INT, 0, 0, MPI_COMM_WORLD, status);
+      MPI_Recv(local_image->array, iheight*iwidth, MPI_INT, 0, 0, MPI_COMM_WORLD, status);
     }
 
     //calculate local final portion after applying the convolution
@@ -83,27 +80,28 @@ int main(int argc, char* argv[]){
     if(my_rank == 0){
       for(int i=0; i<local_image->height; i++){
         for(int j=0; j<local_image->width; j++){
-          set_value(final, i, j, get_value(local_image, i, j));
+          set_value(final, i, j, get_value(local_final, i, j));
         }
       }
-      int index = local_image->height * local_image->width;
-      block_size = (iheight+1-kheight/2) * (iwidth-kwidth/2);
+      int index = local_final->height * local_final->width;
+      block_size = (iheight-((kheight/2)*2)) * (iwidth-((kwidth/2)*2));
       for(int i=1; i<p; i++){
         MPI_Recv(&final->array[index], block_size, MPI_INT, i, 0, MPI_COMM_WORLD, status);
         index += block_size;
       }
     } else{
-      MPI_Send(&local_final->array, local_final->height*local_final->width, MPI_INT, 0, 0, MPI_COMM_WORLD);
+      MPI_Send(local_final->array, local_final->height*local_final->width, MPI_INT, 0, 0, MPI_COMM_WORLD);
     }
-    */
-    //free_matrix(local_image);
-    //free_matrix(local_final);
-    //free_matrix(kernel);
+
+    if(my_rank == 0){
+      write_matrix_to_file(output, final);
+      free_matrix(final);
+      free_matrix(image);
+    }
+    free_matrix(local_image);
+    free_matrix(local_final);
+    free_matrix(kernel);
     MPI_Finalize();
 
-    write_matrix_to_file(output, final);
-
-    free_matrix(image);
-    //free_matrix(final);
     return 0;
 }
