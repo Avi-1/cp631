@@ -1,7 +1,6 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<mpi.h>
-#include <time.h>
 #include"matrix.h"
 #include"basic_functions.h"
 #include"file_io.h"
@@ -14,7 +13,6 @@ int main(int argc, char* argv[]){
     Matrix *kernel_x, *kernel_y, *image, *final, *local_image, *local_final;
     int my_rank, p, kheight, kwidth, iheight, iwidth, block_size;
     MPI_Status *status;
-    clock_t start;
 
     kernel_x = NULL;
     kernel_y = NULL;
@@ -83,18 +81,9 @@ int main(int argc, char* argv[]){
       MPI_Recv(local_image->array, iheight*iwidth, MPI_INT, 0, 0, MPI_COMM_WORLD, status);
     }
 
-    if(my_rank == 0){
-      start = clock();
-    }
     //calculate local final portion after applying the convolution
     local_final = process_image(kernel_x, kernel_y, local_image);
 
-    MPI_Barrier(MPI_COMM_WORLD);
-    if(my_rank == 0){
-      float time_spent = (float)(clock() - start) / CLOCKS_PER_SEC;
-      printf("MPI code Done in %f seconds.\n", time_spent);
-      log_timing("mpi", kernel_x->width, time_spent);
-    }
     //gather finished portions of the final matrix back into the complete final
     //for file output
     if(my_rank == 0){
