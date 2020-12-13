@@ -1,3 +1,4 @@
+import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -14,8 +15,8 @@ plt.plot(arr['kernel_size'][serial], arr['time'][serial], label="Serial")
 plt.plot(arr['kernel_size'][cuda], arr['time'][cuda], label="Cuda")
 plt.plot(arr['kernel_size'][mpi], arr['time'][mpi], label="MPI")
 
-plt.xlabel('Kernel size')
-plt.ylabel('Time, ms')
-plt.title('Timing results')
+plt.xlabel('Kernel size, pixels')
+plt.ylabel('Time, s')
+plt.title('Edge detection filter timing results')
 plt.legend()
-plt.show()
+plt.savefig("Timing_plot.pdf")

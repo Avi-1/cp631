@@ -1,16 +1,18 @@
 #ifndef BASIC_FUNCTIONS_H
 #define BASIC_FUNCTIONS_H
 
-int get_value(Matrix* matrix, int i, int j);
+int get_value(Matrix *matrix, int i, int j);
 
-void set_value(Matrix* m, int i, int j, int v);
+void set_value(Matrix *m, int i, int j, int v);
 
-void initialize_array(Matrix* matrix);
+void initialize_array(Matrix *matrix);
 
-void free_array(Matrix* matrix);
+void free_array(Matrix *matrix);
 
-Matrix* create_matrix(int h, int w);
+Matrix *create_matrix(int h, int w);
 
-void free_matrix(Matrix* m);
+void free_matrix(Matrix *m);
+
+void log_timing(char *implementation, int kernel_size, float time);
 
 #endif

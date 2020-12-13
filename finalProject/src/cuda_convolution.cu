@@ -103,6 +103,7 @@ int main(int argc, char* argv[]){
     write_array_to_file(output, &shadow[0][0], image->height, image->width);
 
     printf("CUDA code done in %f seconds: Output %s\n", time_spent, output);
+    log_timing("cuda", kernel_x->width, time_spent);
 
     cudaFree(image_gpu);
     cudaFree(convoluted_image_gpu);
