@@ -6,9 +6,9 @@
 //apply convolution to a single part of the image matrix
 int apply_convolution(Matrix* kernel, Matrix* image, int i, int j){
   int sum = 0;
-  for(int x=0; x<kernel->height; x++)
-    for(int y=0; y<kernel->width; y++)
-      sum += get_value(kernel, x, y) * get_value(image, x+i, y+j);
+  for (int x = 0; x < kernel->height; x++)
+    for (int y = 0; y < kernel->width; y++)
+      sum += get_value(kernel, x, y) * get_value(image, x + i, y + j);
   return sum;
 }
 

@@ -23,7 +23,14 @@
 ### In-progress
 
 * Avi
+*cuda
+*file IO
 
 * Awstin
+*MPI debugging and omp
 
 * Elena
+*compare kernels to make sure output is the same
+*find kernels for edge detection (vertical and horizontal)
+*find images for testing
+*scripting and testing
