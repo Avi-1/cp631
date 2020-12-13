@@ -82,7 +82,7 @@ int main(int argc, char* argv[]){
     } else{
       MPI_Recv(local_image->array, iheight*iwidth, MPI_INT, 0, 0, MPI_COMM_WORLD, status);
     }
-/*
+
     if(my_rank == 0){
       start = clock();
     }
@@ -116,7 +116,7 @@ int main(int argc, char* argv[]){
     if(my_rank == 0){
       write_matrix_to_file(output, final);
     }
-*/
+
     MPI_Finalize();
 
     return 0;
