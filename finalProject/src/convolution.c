@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "matrix.h"
 #include "basic_functions.h"
 
@@ -38,10 +39,14 @@ int apply_convolution(Matrix* kernel_x, Matrix* kernel_y, Matrix* image, int x, 
 Matrix* process_image(Matrix* kernel_x, Matrix* kernel_y, Matrix* image){
   Matrix* convoluted_matrix = create_matrix(image->height, image->width);
 
+  clock_t start = clock();
   int i,j;
   for(i=0; i<convoluted_matrix->height; i++)
     for(j=0; j<convoluted_matrix->width; j++)
       set_value(convoluted_matrix, i, j, apply_convolution(kernel_x, kernel_y, image, i, j));
+
+  float time_spent = (float)(clock() - start) / CLOCKS_PER_SEC;
+  printf("Serial code Done in %f seconds.\n", time_spent);
 
   return convoluted_matrix;
 }

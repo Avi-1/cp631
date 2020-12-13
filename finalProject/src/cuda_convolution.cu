@@ -85,7 +85,7 @@ int main(int argc, char* argv[]){
     cudaMemcpy(kernel_x_gpu, kernel_x->array, kernel_size, cudaMemcpyHostToDevice);
     cudaMemcpy(kernel_y_gpu, kernel_x->array, kernel_size, cudaMemcpyHostToDevice);
 
-    int blocks = sqrt((2 * image->height * image->width) / 1024);
+    int blocks = 2 * sqrt((image->height * image->width) / 1024);
     dim3 blocksPerGrid(blocks, blocks, 1);
     dim3 threadsPerGrid(32, 32, 1);
     apply_sobel_convolution_cuda<<<blocksPerGrid, threadsPerGrid>>>(kernel_x_gpu, kernel_y_gpu, image_gpu, convoluted_image_gpu, kernel_x->width, image->height, image->width);
@@ -102,7 +102,7 @@ int main(int argc, char* argv[]){
 
     write_array_to_file(output, &shadow[0][0], image->height, image->width);
 
-    printf("GPU Done in %f seconds: Output %s\n", time_spent, output);
+    printf("CUDA code done in %f seconds: Output %s\n", time_spent, output);
 
     cudaFree(image_gpu);
     cudaFree(convoluted_image_gpu);
