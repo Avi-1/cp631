@@ -1,7 +1,10 @@
-all: clean check_basics_tests check_io_tests check_convolution_tests full_program
+all: clean check_basics_tests check_io_tests check_convolution_tests full_program mpi_program
 .PHONY: all
 
-full_program: basic_functions file_io convolution main
+mpi_program:
+	mpicc src/mpi_main.c src/basic_functions.c src/file_io.c src/convolution.c -o build/mpi.x
+
+full_program: main convolution file_io basic_functions
 	gcc target/main.o target/basic_functions.o target/file_io.o target/convolution.o -o build/main.x
 
 check_basics_tests: basic_functions check_basics

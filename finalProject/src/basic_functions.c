@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "matrix.h"
+//basic functions for matrix IO to simplify the indexing math and
+//create and free the matrices
 
 int get_value(Matrix* m, int i, int j){
   return m->array[i*m->width + j];
