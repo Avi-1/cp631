@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 fname = sys.argv[1]
+file_out = fname[:fname.rfind('.')] + ".pdf"
+print("Save timingn plot to ", file_out)
+
 dtype1 = np.dtype([('implementation', 'S20'),
                    ('kernel_size', 'i1'), ('time', 'f8')])
 arr = np.loadtxt(fname, dtype=dtype1, delimiter=',')
@@ -19,4 +22,4 @@ plt.xlabel('Kernel size, pixels')
 plt.ylabel('Time, s')
 plt.title('Edge detection filter timing results')
 plt.legend()
-plt.savefig("Timing_plot.pdf")
+plt.savefig(file_out)
