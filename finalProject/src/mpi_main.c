@@ -12,7 +12,7 @@ int main(int argc, char* argv[]){
     //initialize variables needed
     char *kern_x, *kern_y, *img, *output;
     Matrix *kernel_x, *kernel_y, *image, *final, *local_image, *local_final;
-    int my_rank, p, kheight, kwidth, iheight, iwidth, block_size;
+    int my_rank, p, kheight, kwidth, iheight, iwidth, block_size, i, j;
     MPI_Status *status;
     clock_t start;
 
@@ -44,9 +44,9 @@ int main(int argc, char* argv[]){
       final = create_matrix(image->height, image->width);
       kheight = kernel_x->height;
       kwidth = kernel_x->width;
-      iheight = image->height/p + (kheight/2);
+      iheight = image->height/p;
       iwidth = image->width;
-      local_image = create_matrix(image->height/p, iwidth);
+      local_image = create_matrix(iheight, iwidth);
     }
 
     //broadcast dimension information to all other processes
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]){
     if(my_rank != 0){
       kernel_x = create_matrix(kheight, kwidth);
       kernel_y = create_matrix(kheight, kwidth);
-      local_image = create_matrix(iheight, iwidth);
+      local_image = create_matrix(iheight + (kheight-1), iwidth);
     }
 
     //broadcast kernel_x so every process has a copy
@@ -69,18 +69,19 @@ int main(int argc, char* argv[]){
     //copy image portion into local matrix and send image slices out to other
     //processes
     if(my_rank == 0){
-      for(int i=0; i<local_image->height; i++){
-        for(int j=0; j<local_image->width; j++){
+      for(i=0; i<local_image->height; i++){
+        for(j=0; j<local_image->width; j++){
           set_value(local_image, i, j, get_value(image, i, j));
         }
       }
-      int index = (iheight-1-kheight/2) * iwidth;
-      block_size = iheight*iwidth;
-      for(int i=1; i<p; i++){
-        MPI_Send(&image->array[index*i], block_size, MPI_INT, i, 0, MPI_COMM_WORLD);
+      int index = (iheight-(kheight-1)) * iwidth;
+      block_size = (iheight+(kheight-1)) * iwidth;
+      for(i=1; i<p; i++){
+        MPI_Send(&image->array[index], block_size, MPI_INT, i, 0, MPI_COMM_WORLD);
+        index += iheight*iwidth;
       }
     } else{
-      MPI_Recv(local_image->array, iheight*iwidth, MPI_INT, 0, 0, MPI_COMM_WORLD, status);
+      MPI_Recv(local_image->array, (iheight+(kheight-1))*iwidth, MPI_INT, 0, 0, MPI_COMM_WORLD, status);
     }
 
     if(my_rank == 0){
@@ -95,22 +96,24 @@ int main(int argc, char* argv[]){
       printf("MPI code Done in %f seconds.\n", time_spent);
       log_timing("MPI", kernel_x->width, time_spent);
     }
+
     //gather finished portions of the final matrix back into the complete final
     //for file output
     if(my_rank == 0){
-      for(int i=0; i<local_image->height; i++){
-        for(int j=0; j<local_image->width; j++){
+      for(i=0; i<local_image->height; i++){
+        for(j=0; j<local_image->width; j++){
           set_value(final, i, j, get_value(local_final, i, j));
         }
       }
-      int index = local_final->height * local_final->width;
-      block_size = iheight*iwidth;
-      for(int i=1; i<p; i++){
+      int index = (local_final->height-(kheight-1)) * local_final->width;
+      block_size = (iheight+kheight/2)*iwidth;
+      for(i=1; i<p; i++){
         MPI_Recv(&final->array[index], block_size, MPI_INT, i, 0, MPI_COMM_WORLD, status);
-        index += block_size;
+        index += iheight*iwidth;
       }
     } else{
-      MPI_Send(local_final->array, local_final->height*local_final->width, MPI_INT, 0, 0, MPI_COMM_WORLD);
+      block_size = (iheight+kheight/2)*iwidth;
+      MPI_Send(&local_final->array[local_final->width*(kheight/2)], block_size, MPI_INT, 0, 0, MPI_COMM_WORLD);
     }
 
     if(my_rank == 0){
@@ -121,4 +124,3 @@ int main(int argc, char* argv[]){
 
     return 0;
 }
-
