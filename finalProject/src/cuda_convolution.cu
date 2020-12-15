@@ -37,19 +37,14 @@ __global__ void apply_sobel_convolution_cuda(int *kernel_x, int *kernel_y, int *
             output[index] = 255; // Ignore the border
         } else {
             int i, j;
-            // Apply x
+            
             for(i = 0-border; i <= border; i++){
                 for(j = 0-border; j <= border; j++){
-                    //convolution_sum_x += kernel_x[(i+border) * kernel_x_dim + j+border] * image[(row+i)*image_width + col+j];
-                    convolution_sum_x += shared_kernel_x[i+border][j+border] * image[(row+i)*image_width + col+j];
-                }
-            }
-
-            // Apply y
-            for(i = 0-border; i <= border; i++){
-                for(j = 0-border; j <= border; j++){
-                    //convolution_sum_y += kernel_y[(i+border) * kernel_x_dim + j+border] * image[(row+i)*image_width + col+j];
-                    convolution_sum_y += shared_kernel_y[i+border][j+border] * image[(row+i)*image_width + col+j];
+                    int pixel = image[(row+i)*image_width + col+j];
+                    // Apply x
+                    convolution_sum_x += shared_kernel_x[i+border][j+border] * pixel;
+                    // Apply y
+                    convolution_sum_y += shared_kernel_y[i+border][j+border] * pixel;
                 }
             }
 
@@ -79,8 +74,6 @@ int main(int argc, char* argv[]){
     printf("Kernel X width = %d height= %d. \n", kernel_x->width, kernel_x->height);
     printf("Kernel Y width = %d height= %d. \n", kernel_y->width, kernel_y->height);
 
-
-    // int temp[image->height][ image->width];
     int shadow[image->height][ image->width];
 
     int *image_gpu;
@@ -99,7 +92,6 @@ int main(int argc, char* argv[]){
     cudaMalloc((void **) &kernel_y_gpu, kernel_size);
 
     cudaMemcpy(image_gpu, image->array, image_size, cudaMemcpyHostToDevice);
-    //cudaMemcpy(convoluted_image_gpu, temp, image_size, cudaMemcpyHostToDevice);
     cudaMemcpy(kernel_x_gpu, kernel_x->array, kernel_size, cudaMemcpyHostToDevice);
     cudaMemcpy(kernel_y_gpu, kernel_x->array, kernel_size, cudaMemcpyHostToDevice);
 
