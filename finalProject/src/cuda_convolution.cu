@@ -33,7 +33,7 @@ __global__ void apply_sobel_convolution_cuda(int *kernel_x, int *kernel_y, int *
         int gradient_magnitude, border = kernel_x_dim/2;
         int convolution_sum_x = 0, convolution_sum_y = 0;
 
-        if(row < 1 || col < 1 || row > image_height-border-1 || col > image_width-1){
+        if(row < border || col < border || row > image_height-border-1 || col > image_width-1){
             output[index] = 255; // Ignore the border
         } else {
             int i, j;
